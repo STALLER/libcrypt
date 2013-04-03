@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdio>
 
+#include "hashutils.h"
 #include "md2.h"
 
 using namespace std;

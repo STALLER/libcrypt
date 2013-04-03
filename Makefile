@@ -22,5 +22,8 @@ $(EX): $(OBJECT)
 clean:
 	rm -f *.o
 
-cleanall: clean
+cleantmp:
+	rm -f *\~ $(INCLUDE_DIR)/*\~
+
+cleanall: clean cleantmp
 	rm -f $(EX)

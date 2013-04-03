@@ -6,6 +6,7 @@
 
 #include <cstdio>	// sprintf_s
 
+#include "hashutils.h"
 #include "md5.h"
 
 using namespace std;
@@ -22,7 +23,7 @@ void md5_private(uint8_t* str, size_t size, MD5Hash* h)
 	while((len%512) != 448) len++;
 	len = len/8;
 
-	uint8_t* msg = (uint8_t*) calloc(len + 64, sizeof(uint8_t));
+	uint8_t* msg = (uint8_t*) calloc(len + 8, sizeof(uint8_t));
 	memcpy(msg, str, size);
 
 	msg[size] = 128;	// Set bit 1
@@ -39,22 +40,22 @@ void md5_private(uint8_t* str, size_t size, MD5Hash* h)
 		{
 			if(i<16)
 			{
-				val = F(b,c,d);
+				val = MD5_F(b,c,d);
 				g = i;
 			} 
 			else if (i<32)
 			{
-				val = G(b,c,d);
+				val = MD5_G(b,c,d);
 				g = (5*i+1)%16;
 			}
 			else if (i<48)
 			{
-				val = H(b,c,d);
+				val = MD5_H(b,c,d);
 				g = (3*i+5)%16;
 			}
 			else
 			{
-				val = I(b,c,d);
+				val = MD5_I(b,c,d);
 				g = (7*i)%16;
 			}
 
@@ -72,18 +73,6 @@ void md5_private(uint8_t* str, size_t size, MD5Hash* h)
 	}
 
 	return;
-}
-
-uint32_t littleEndian(uint32_t n)
-{
-	uint32_t ret = 0;
-
-	ret |= (n & (uint32_t) 0x000000ff) << 24;
-	ret |= ((n & (uint32_t) 0x0000ff00) >> 8) << 16;
-	ret |= ((n & (uint32_t) 0x00ff0000) >> 16) << 8;
-	ret |= (n & (uint32_t) 0xff000000) >> 24;
-
-	return ret;
 }
 
 void md5hash2littleEndian(MD5Hash* h)

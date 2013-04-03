@@ -1,15 +1,13 @@
-#ifndef MD5_H
-#define MD5_H
+#ifndef MD5_HEAD
+#define MD5_HEAD
 
 #include <iostream>
-#include <stdint.h>
+#include <cstdint>
 
-#define LEFTROTATE(x, c) (((x) << (c)) | ((x) >> (32 - (c))))
-
-#define F(x,y,z) (((x) & (y)) | ((~(x)) & (z)))
-#define G(x,y,z) (((x) & (z)) | ((~(z)) & (y)))
-#define H(x,y,z) ((x) ^ (y) ^ (z))
-#define I(x,y,z) ((y) ^ ( (x) | (~(z)) )) 
+#define MD5_F(x,y,z) (((x) & (y)) | ((~(x)) & (z)))
+#define MD5_G(x,y,z) (((x) & (z)) | ((~(z)) & (y)))
+#define MD5_H(x,y,z) ((x) ^ (y) ^ (z))
+#define MD5_I(x,y,z) ((y) ^ ( (x) | (~(z)) )) 
 
 typedef struct MD5Hash
 {
