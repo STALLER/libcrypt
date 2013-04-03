@@ -3,7 +3,8 @@ OBJECT=$(patsubst %.cpp,%.o,$(EXEC))
 EX=crypt
 
 CC=g++
-CFLAGS=-I. -std=c++0x
+INCLUDE_DIR=includes
+CFLAGS=-I$(INCLUDE_DIR)/ -std=c++0x
 
 .PHONY: clean all cleanall
 
@@ -12,7 +13,7 @@ all: $(EX)
 $(EX): $(OBJECT)
 	$(CC) $(OBJECT) -o $(EX)
 
-%.o: %.cpp %.h
+%.o: %.cpp $(INCLUDE_DIR)/%.h
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 %.o: %.cpp
