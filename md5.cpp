@@ -25,7 +25,7 @@ void md5_private(uint8_t* str, size_t size, MD5Hash* h)
 	uint8_t* msg = (uint8_t*) calloc(len + 64, sizeof(uint8_t));
 	memcpy(msg, str, size);
 
-	msg[size] = 0x80;	// Set bit 1
+	msg[size] = 128;	// Set bit 1
 
 	uint32_t bitsSize = 8*size;
 	memcpy(msg + len, &bitsSize, 4);
@@ -33,7 +33,7 @@ void md5_private(uint8_t* str, size_t size, MD5Hash* h)
 	for(unsigned int offset = 0; offset < len; offset += 64)
 	{
 		w = (uint32_t*) (msg+offset);
-		a = a0; b = b0; c = c0; d = d0;
+		a = h->a; b = h->b; c = h->c; d = h->d;
 
 		for(int i=0; i<64; i++)
 		{

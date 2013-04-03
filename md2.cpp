@@ -33,6 +33,7 @@ string MD2HashToString(uint8_t h[16])
 void md2private(uint8_t* str, size_t size, uint8_t h[16])
 {
 	size_t len = size;
+	if(!(len%16)) len++;
 	while(len%16) len++;
 
 	int pad = (int) (len-size);
@@ -50,12 +51,39 @@ void md2private(uint8_t* str, size_t size, uint8_t h[16])
 		{
 			c = msg[i*16+j];
 			C[j] = C[j] ^ MD2_S[c^L];
-            cout << (int) c << " - " << L << " - " << (c^L) << " - " << (int) MD2_S[c^L] << endl;
 			L = C[j];
 		}
-        cout << "---------------" << endl;
 	}
 
-    cout << "Checksum : " << MD2HashToString(C) << endl;
+	msg = (uint8_t*) realloc(msg, (len+=16)*sizeof(uint8_t));
+	memcpy(msg+len-16, C, 16*sizeof(uint8_t));
+	
+	uint8_t* X = (uint8_t*) calloc(48, sizeof(uint8_t));
+	uint8_t t;
+	
+	for(int i=0; i<len/16; i++)
+	{
+		for(int j=0; j<16; j++)
+		{
+			X[16+j] = msg[i*16+j];
+			X[32+j] = X[16+j] ^ X[j];
+		}
+		
+		t = 0;
+		
+		for(int j=0; j<18; j++)
+		{
+			for(int k=0; k<48; k++)
+			{
+				t = X[k] ^ MD2_S[t];
+				X[k] = t;
+			}
+			t = (t+j)%256;
+		}
+	}
 
+	for(int i=0; i<16; i++)
+		h[i] = X[i];
+	
+	free(msg);
 }
