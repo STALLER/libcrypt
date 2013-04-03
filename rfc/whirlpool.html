@@ -1,0 +1,473 @@
+<html><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <meta name="Author" content="Paulo S. L. M. Barreto, Vincent Rijmen">
+    <meta name="Description" content="The Whirlpool Hash Function">
+    <meta name="Keywords" content="hash function, cryptographic primitive"><title>The Whirlpool Hash Function</title></head><body alink="#ff0000" background="whiteMarble.jpg" bgcolor="#ffffff" link="#0000ee" text="#000000" vlink="#551a8b">
+
+<center>
+<table bgcolor="#ffd700" border="4" cellpadding="2" cellspacing="2">
+<tbody><tr>
+	<td>
+		&nbsp;<font color="#003377" face="Verdana" size="+3"><b>The <i><font color="#003377">W</font><font color="#003377" face="Verdana" size="+2">HIRLPOOL</font></i>
+Hash Function</b></font>&nbsp;
+	</td>
+</tr>
+</tbody></table>
+<br>
+<img src="m51mclaughlin.jpg" alt="M51 - The Whirlpool Galaxy" border="4"><br>
+
+M51 (Whirlpool) Galaxy in Canes Venatici. Image courtesy of <a href="http://willmclaughlin.astrodigitals.com/">William McLaughlin</a>.
+
+</center>
+
+<h2 align="center"><font color="#003377">Welcome!</font></h2>
+
+<ul>
+
+<b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b>
+is a hash function designed by <a href="http://www.iaik.tugraz.at/content/about_iaik/people/rijmen_vincent/">
+Vincent Rijmen</a> and <a href="http://www.larc.usp.br/~pbarreto">
+Paulo S. L. M. Barreto</a> that operates on messages less than 2<sup>256</sup> bits in length,
+and produces a message digest of 512 bits.
+<br><br>
+
+Historically, <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b>
+had three versions. The first version,
+<b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL-0</font></b>,
+was submitted to the <a href="http://www.cryptonessie.org/">NESSIE project</a>. 
+Its "tweaked" successor, <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL-T</font></b>,
+was selected for the <a href="http://www.cryptonessie.org/">NESSIE portfolio of cryptographic primitives</a>.
+A flaw in its diffusion layer reported by Shirai and Shibutani ("On the
+diffusion matrix employed in the Whirlpool hashing function," NESSIE
+public report, 2003) was fixed afterwards, and the final version
+(called simply <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b>
+for short) was adopted by the International Organization for Standardization (<b>ISO</b>) 
+in the <a href="http://www.iso.org/iso/en/CatalogueDetailPage.CatalogueDetail?CSNUMBER=39876&amp;scopelist=">ISO/IEC 10118-3:2004</a> standard.
+<br><br>
+
+<hr><p></p><h2><i><font color="#003377">The function</font></i></h2><p></p>
+
+<b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b> uses Merkle-Damgård strengthening and the Miyaguchi-Preneel hashing scheme with a dedicated 512-bit block cipher called <i><b>W</b></i>.
+This consists of the following. The bit string to be hashed is padded
+with a &amp;lquo;'1'-bit, then with a sequence of '0'-bits, and finally
+with the original length (in the form of a 256-bit integer value), so
+that the length after padding is a multiple of 512 bits.
+The resulting message string is divided into a sequence of 512-bit
+blocks <i>m</i><sub>1</sub>, <i>m</i><sub>2</sub>, ... <i>m</i><sub>t</sub> which is then used to generate a sequence of intermediate hash values <i>H</i><sub>0</sub>, <i>H</i><sub>1</sub>, <i>H</i><sub>2</sub>, ... <i>H</i><sub>t</sub>. By definition, <i>H</i><sub>0</sub> is a string of 512 '0'-bits. To compute <i>H</i><sub><i>i</i></sub>, <i><b>W</b></i> encrypts <i>m</i><sub><i>i</i></sub> using <i>H</i><sub><i>i</i>-1</sub> as key, and XORs the resulting ciphertext with both <i>H</i><sub><i>i</i>-1</sub> and <i>m<sub><i>i</i></sub></i>. Finally, the <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b> message digest is <i>H</i><sub>t</sub>.
+
+<br><br>
+
+<center>
+
+	<b>Miyaguchi-Preneel compression function:</b><br>
+
+<img src="MiyaguchiPreneel.gif" alt="Miyaguchi-Preneel compression function">
+</center>
+
+<hr><p></p><h2><font color="#003377"><i>The internal</i> <b>W</b> <i>block cipher</i></font></h2><p></p>
+
+The <i><b>W</b></i>&nbsp; block cipher used by <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b> is very similar to the <a href="http://csrc.nist.gov/archive/aes/rijndael/wsdindex.html">AES</a> algorithm, <a href="http://www.iaik.tugraz.at/content/research/krypto/aes/">R<font size="-1">IJNDAEL</font></a>, the main differences being sketched in the following table:
+
+<br><br>
+
+</ul>
+
+<center>
+<table bgcolor="#ccffcc" border="1" cellpadding="5" cellspacing="5">
+<caption align="top">
+	<h3>Table 1: Differences between <b>R<font size="-1">IJNDAEL</font></b> and <i><b>W</b></i></h3>
+</caption>
+
+<tbody><tr>
+	<td>&nbsp;</td>
+	<th><b>R<font size="-1">IJNDAEL</font></b></th>
+	<th><i><b>W</b></i></th>
+</tr>
+
+<tr>
+	<td><b>Block size (bits)</b></td>
+	<td>128, 160, 192, 224, or 256</td>
+	<td>always 512</td>
+</tr>
+
+<tr>
+	<td><b>Number of rounds</b></td>
+	<td>10, 11, 12, 13, or 14</td>
+	<td>always 10</td>
+</tr>
+
+<tr>
+	<td><b>Key schedule</b></td>
+	<td>dedicated <i>a priori</i> algorithm</td>
+	<td>the round function itself</td>
+</tr>
+
+<tr>
+	<td><b>GF(2<sup>8</sup>) reduction polynomial</b></td>
+	<td><i>x</i><sup>8</sup> + <i>x</i><sup>4</sup> + <i>x</i><sup>3</sup> + <i>x</i> + 1 (<font face="Courier">0x11B</font>)</td>
+	<td><i>x</i><sup>8</sup> + <i>x</i><sup>4</sup> + <i>x</i><sup>3</sup> + <i>x</i><sup>2</sup> + 1 (<font face="Courier">0x11D</font>)</td>
+</tr>
+
+<tr>
+	<td><b>Origin of the S-box</b></td>
+	<td>mapping <i>u</i> &#8594; <i>u</i><sup>-1</sup> over GF(2<sup>8</sup>),<br>plus affine transform</td>
+	<td>recursive structure (see below)</td>
+</tr>
+
+<tr>
+	<td><b>Origin of the round constants</b></td>
+	<td>polynomials <i>x<sup>i</sup></i> over GF(2<sup>8</sup>)</td>
+	<td>successive entries of the S-box</td>
+</tr>
+
+<tr>
+	<td><b>Diffusion layer</b></td>
+	<td>left-multiplication by the<br>4×4 circulant	MDS matrix<br>cir(2, 3, 1, 1)</td>
+	<td>right-multiplication by the<br>8×8 circulant MDS matrix<br>cir(1, 1, 4, 1, 8, 5, 2, 9)</td>
+</tr>
+
+</tbody></table>
+</center>
+<br>
+
+<ul>
+The <i><b>W</b></i>&nbsp; S-box, which in the original submission
+is generated entirely at random (i.e. lacks any internal structure), by
+a recursive structure: the new 8×8 substitution box is composed of
+smaller 4×4 "mini-boxes" (the exponential <i>E</i>-box, its inverse, and the pseudo-randomly generated <i>R</i>-box).
+</ul>
+
+<center>
+
+	<b>The recursive structure of the "tweaked" <i>S</i>-box:</b><br>
+
+<img src="whirlbox.gif" alt="The Whirlpool S-box">
+</center>
+<br>
+
+<center>
+<table bgcolor="#6cffaa" border="1" cellpadding="2" cellspacing="2">
+<caption align="top">
+	<b>The <i>E</i> mini-box:
+</b></caption>
+<tbody><tr>
+	<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>u</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+	<th><font face="Courier">0</font></th>
+	<th><font face="Courier">1</font></th>
+	<th><font face="Courier">2</font></th>
+	<th><font face="Courier">3</font></th>
+
+	<th><font face="Courier">4</font></th>
+	<th><font face="Courier">5</font></th>
+	<th><font face="Courier">6</font></th>
+	<th><font face="Courier">7</font></th>
+
+	<th><font face="Courier">8</font></th>
+	<th><font face="Courier">9</font></th>
+	<th><font face="Courier">A</font></th>
+	<th><font face="Courier">B</font></th>
+
+	<th><font face="Courier">C</font></th>
+	<th><font face="Courier">D</font></th>
+	<th><font face="Courier">E</font></th>
+	<th><font face="Courier">F</font></th>
+
+</tr>
+<tr>
+	<th><i>E</i>(<i>u</i>)</th>
+	<th><font face="Courier">1</font></th>
+	<th><font face="Courier">B</font></th>
+	<th><font face="Courier">9</font></th>
+	<th><font face="Courier">C</font></th>
+
+	<th><font face="Courier">D</font></th>
+	<th><font face="Courier">6</font></th>
+	<th><font face="Courier">F</font></th>
+	<th><font face="Courier">3</font></th>
+
+	<th><font face="Courier">E</font></th>
+	<th><font face="Courier">8</font></th>
+	<th><font face="Courier">7</font></th>
+	<th><font face="Courier">4</font></th>
+
+	<th><font face="Courier">A</font></th>
+	<th><font face="Courier">2</font></th>
+	<th><font face="Courier">5</font></th>
+	<th><font face="Courier">0</font></th>
+</tr>
+</tbody></table>
+<br>
+<table bgcolor="#930055" border="1" cellpadding="2" cellspacing="2">
+<caption align="top">
+	<b>The <i>E</i><sup> -1</sup> mini-box:</b>
+</caption>
+<tbody><tr>
+	<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i><font color="#ffffff">u</font></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+
+	<th><font color="#ffffff" face="Courier">0</font></th>
+	<th><font color="#ffffff" face="Courier">1</font></th>
+	<th><font color="#ffffff" face="Courier">2</font></th>
+	<th><font color="#ffffff" face="Courier">3</font></th>
+
+	<th><font color="#ffffff" face="Courier">4</font></th>
+	<th><font color="#ffffff" face="Courier">5</font></th>
+	<th><font color="#ffffff" face="Courier">6</font></th>
+	<th><font color="#ffffff" face="Courier">7</font></th>
+
+	<th><font color="#ffffff" face="Courier">8</font></th>
+	<th><font color="#ffffff" face="Courier">9</font></th>
+	<th><font color="#ffffff" face="Courier">A</font></th>
+	<th><font color="#ffffff" face="Courier">B</font></th>
+
+	<th><font color="#ffffff" face="Courier">C</font></th>
+	<th><font color="#ffffff" face="Courier">D</font></th>
+	<th><font color="#ffffff" face="Courier">E</font></th>
+	<th><font color="#ffffff" face="Courier">F</font></th>
+</tr>
+<tr>
+	<th><font color="#ffffff"><i>E</i><sup> -1</sup>(<i>u</i>)</font></th>
+
+	<th><font color="#ffffff" face="Courier">F</font></th>
+	<th><font color="#ffffff" face="Courier">0</font></th>
+	<th><font color="#ffffff" face="Courier">D</font></th>
+	<th><font color="#ffffff" face="Courier">7</font></th>
+
+	<th><font color="#ffffff" face="Courier">B</font></th>
+	<th><font color="#ffffff" face="Courier">E</font></th>
+	<th><font color="#ffffff" face="Courier">5</font></th>
+	<th><font color="#ffffff" face="Courier">A</font></th>
+
+	<th><font color="#ffffff" face="Courier">9</font></th>
+	<th><font color="#ffffff" face="Courier">2</font></th>
+	<th><font color="#ffffff" face="Courier">C</font></th>
+	<th><font color="#ffffff" face="Courier">1</font></th>
+
+	<th><font color="#ffffff" face="Courier">3</font></th>
+	<th><font color="#ffffff" face="Courier">4</font></th>
+	<th><font color="#ffffff" face="Courier">8</font></th>
+	<th><font color="#ffffff" face="Courier">6</font></th>
+</tr>
+</tbody></table>
+<br>
+<table bgcolor="#00dbff" border="1" cellpadding="2" cellspacing="2">
+<caption align="top">
+	<b>The <i>R</i> mini-box:</b>
+</caption>
+<tbody><tr>
+	<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>u</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+
+	<th><font face="Courier">0</font></th>
+	<th><font face="Courier">1</font></th>
+	<th><font face="Courier">2</font></th>
+	<th><font face="Courier">3</font></th>
+
+	<th><font face="Courier">4</font></th>
+	<th><font face="Courier">5</font></th>
+	<th><font face="Courier">6</font></th>
+	<th><font face="Courier">7</font></th>
+
+	<th><font face="Courier">8</font></th>
+	<th><font face="Courier">9</font></th>
+	<th><font face="Courier">A</font></th>
+	<th><font face="Courier">B</font></th>
+
+	<th><font face="Courier">C</font></th>
+	<th><font face="Courier">D</font></th>
+	<th><font face="Courier">E</font></th>
+	<th><font face="Courier">F</font></th>
+</tr>
+<tr>
+	<th><i>R</i>(<i>u</i>)</th>
+
+	<th><font face="Courier">7</font></th>
+	<th><font face="Courier">C</font></th>
+	<th><font face="Courier">B</font></th>
+	<th><font face="Courier">D</font></th>
+
+	<th><font face="Courier">E</font></th>
+	<th><font face="Courier">4</font></th>
+	<th><font face="Courier">9</font></th>
+	<th><font face="Courier">F</font></th>
+
+	<th><font face="Courier">6</font></th>
+	<th><font face="Courier">3</font></th>
+	<th><font face="Courier">8</font></th>
+	<th><font face="Courier">A</font></th>
+
+	<th><font face="Courier">2</font></th>
+	<th><font face="Courier">5</font></th>
+	<th><font face="Courier">1</font></th>
+	<th><font face="Courier">0</font></th>
+</tr>
+</tbody></table>
+</center>
+
+<ul>
+
+<br>
+
+<hr><p></p><h2><i><font color="#003377">The documentation</font></i></h2><p></p>
+
+The <a href="http://www.larc.usp.br/~pbarreto/whirlpool.zip">documentation package</a> contains:
+<br><br>
+<ul>
+<li>the specification (DVI, PDF, PS),</li>
+<li>reference implementations (C, Java), and</li>
+<li>test vectors (NESSIE, ISO) for the standardized version of <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b>.</li>
+</ul>
+<br>
+
+The reference implementations are in the public domain. But before you go and use it, please read the accompanying disclaimer:
+<br><br>
+
+<ul>
+<font face="Courier" size="-1">
+THIS SOFTWARE IS PROVIDED BY THE AUTHORS ''AS IS'' AND ANY EXPRESS<br>
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED<br>
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE<br>
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE<br>
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR<br>
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF<br>
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR<br>
+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,<br>
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE<br>
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,<br>
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</font>
+</ul>
+
+<br>
+
+<hr><p></p><h2><i><font color="#003377">The security statement</font></i></h2><p></p>
+
+Assume we take as hash result the value of any <i>n</i>-bit substring of the full <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b> output.
+The design of <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b>
+sets the following security goals:
+
+<table>
+<tbody><tr><td> 
+    <ul> 
+
+    <li>
+The expected workload of generating a collision is of the order of 2<sup><i>n</i>/2</sup> executions of <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b>.
+    </li> 
+ 
+    <li>
+Given an <i>n</i>-bit value, the expected workload of finding a message that hashes to that value is of the order of 2<sup><i>n</i></sup> executions of <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b>.
+    </li> 
+ 
+    <li>
+Given a message and its <i>n</i>-bit hash result, the expected workload of finding a second message that hashes to the same value is of the order of 2<sup><i>n</i></sup> executions of <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b>.
+    </li> 
+ 
+    <li>
+It is infeasible to detect systematic correlations between any linear
+combination of input bits and any linear combination of bits of the
+hash result, or to predict what bits of the hash result will change
+value when certain input bits are flipped (this means resistance
+against linear and differential attacks). </li> 
+ 
+    </ul>
+</td>
+</tr></tbody></table> 
+
+These claims result from the considerable safety margin taken with respect to all known attacks.
+We do however realise that it is impossible to make non-speculative statements on things unknown.
+
+<br><br>
+In spite of any analysis, doubts might remain regarding the presence of
+trapdoors deliberately introduced in the algorithm. That is why the
+<font color="#ff0000"><b>NESSIE</b></font> effort asked for the designers'
+declaration on the contrary. Therefore we, the designers of
+<b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b>,
+do hereby declare that there are no hidden weaknesses inserted by us in the
+<b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b> primitive.
+
+<br><br>
+
+<hr><p></p><h2><i><font color="#003377">The availability</font></i></h2><p></p>
+
+<b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b> is not (and will never be) patented.
+It may be used free of charge for any purpose. The <a href="http://www.larc.usp.br/%7Epbarreto/whirlpool.zip">reference implementations</a> are in the public domain.
+
+<br><br>
+
+<hr><p></p><h2><i><font color="#003377">The name</font></i></h2><p></p>
+
+The <b><font color="#003377">W</font><font color="#003377" size="-1">HIRLPOOL</font></b>
+hashing function is named after the Whirlpool galaxy in Canes Venatici
+(M51, or NGC 5194), the first one recognized to have spiral structure
+by William Parsons, third Earl of Rosse, in April 1845 (cf. M. Hoskin, "<i>The Cambridge Illustrated History of Astronomy</i>," Cambridge University Press, 1997).
+
+<br><br>
+
+<center>
+<img src="m51ing.jpg" alt="M51 - The Whirlpool Galaxy" border="4"><br>
+
+Another nice, true-colour photograph of the Whirlpool Galaxy, taken by Peter Bunclark (IoA).<br>
+Image courtesy of the <a href="http://www.ing.iac.es/">Isaac Newton Group of Telescopes</a>, La Palma.
+
+</center>
+
+<br>
+
+<hr><p></p><h2><i><font color="#003377">Links</font></i></h2><p></p>
+
+<ul>
+<table>
+<tbody>
+<tr>
+    <td>
+    <ul>
+        <li><a href="http://www.larc.usp.br/%7Epbarreto/hflounge.html">The Hash Function Lounge</a></li>
+    </ul>
+    </td>
+
+    <td>
+    <ul>
+    </ul>
+    </td>
+
+    <td>
+    <ul>
+        <li><a href="http://www.larc.usp.br/%7Epbarreto">Paulo's page</a></li>
+    </ul>
+    </td>
+
+    <td>
+    <ul>
+    </ul>
+    </td>
+
+    <td>
+    <ul>
+        <li><a href="http://www.iaik.tugraz.at/content/about_iaik/people/rijmen_vincent/">Vincent's page</a></li>
+    </ul>
+    </td>
+</tr>
+</tbody>
+</table>
+</ul>
+<br>
+
+<hr>
+
+</ul>
+
+<center>
+<i>Visits between </i><b><font size="-1">2001.05.06</font></b> and </i><b><font size="-1">2008.11.19</font></b>:
+<br>
+<img src="OldWhirlpoolCount.gif">
+<br>
+<i>Visits since </i><b><font size="-1">2008.11.19</font></b>:
+<br>
+<img src="/cgi-bin/Counter/Count.cgi?df=pbarretoWhirlpool&dd=C&ft=4&st=54108">
+<br>
+<i>Last update</i>:&nbsp;<b><font size="-1">2008.11.25</font></b>
+<br>
+<i><font size="-1">
+Copyright </font>©<font size="-1"> 2001, 2008 by
+Paulo S. L. M. Barreto.&nbsp; All rights reserved.
+</font></i>
+</center>
+</body></html>
